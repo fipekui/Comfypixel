@@ -13,8 +13,11 @@ cp $file ${filename}_use.gif
 file=${filename}_use.gif
 #filename=$(echo $file |cut -d"." -f1)
 
-
+echo $file
 echo $filename
+
+if test $(wmctrl -lG |grep $filename 2>&1 |wc -l) -eq 0;then gifview -a $file; fi
+exit
 
 xwindim=$(wmctrl -lG |grep $filename |awk '{print $5}')
 ywindim=$(wmctrl -lG |grep $filename |awk '{print $6}')
