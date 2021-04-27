@@ -1,0 +1,94 @@
+#!/bin/bash
+
+# count=`expr 3 / 3` 
+
+file=$1
+filename=$(echo $file |cut -d"." -f1)
+cp $file ${filename}_bu.gif
+
+xwindim=$(wmctrl -lG |grep $filename |awk '{print $5}')
+ywindim=$(wmctrl -lG |grep $filename |awk '{print $6}')
+
+#xwindim=$(wmctrl -lG |grep gifview |awk '{print $5}')
+#ywindim=$(wmctrl -lG |grep gifview |awk '{print $6}')
+
+xpicdim=$(file $file |awk '{print $7}')
+ypicdim=$(file $file |awk '{print $9}')
+
+
+echo $xwindim $ywindim $xpicdim $ypicdim 
+
+if [ $xpicdim -lt $xwindim ] && [ $ypicdim -ge $ywindim ]
+then
+echo IMAGE TOO HIGH AND TOO NARROW 
+	scale=$(echo $xwindim / $xpicdim |bc -l)
+	ypicdimnew=$(echo $scale \* $ypicdim |bc -l)
+	ypicdimnew=$(printf "%.0f" $ypicdimnew)
+	xpicdimnew=$xwindim
+	echo $xpicdimnew $ypicdimnew
+fi
+
+if [ $xpicdim -ge $xwindim ] && [ $ypicdim -lt $ywindim ]
+then
+echo IMAGE TOO WIDE AND TOO LOW
+	scale=$(echo $ywindim / $ypicdim |bc -l)
+	xpicdimnew=$(echo $scale \* $xpicdim |bc -l)
+	xpicdimnew=$(printf "%.0f" $xpicdimnew)
+	ypicdimnew=$ywindim
+	echo $xpicdimnew $ypicdimnew
+fi
+
+if [ $xpicdim -ge $xwindim ] && [ $ypicdim -ge $ywindim ]
+then
+echo IMAGE TOO HIGH AND TOO WIDE
+	xdif=$(echo $xpicdim - $xwindim |bc -l)
+	ydif=$(echo $ypicdim - $ywindim |bc -l)
+
+	echo perse2
+	echo $xdif
+	echo $ydif
+
+	if [ $xdif -lt $ydif ]
+	then
+		echo perse4
+		scale=$(echo $xwindim / $xpicdim |bc -l)
+		echo $scale
+		xpicdimnew=$(echo $xpicdim \* $scale |bc -l)
+		xpicdimnew=$(printf "%.0f" $xpicdimnew)
+		echo perse8 $ypicdim
+		ypicdimnew=$(echo $ypicdim \* $scale |bc -l) 
+		ypicdimnew=$(printf "%.0f" $ypicdimnew)
+		echo perse6 $xpicdimnew
+		echo perse7 $ypicdimnew
+	fi
+
+	if [ $xdif -gt $ydif ]
+	then
+		echo perse5
+		
+		scale=$(echo $ywindim / $ypicdim |bc -l)
+		echo $scale
+		xpicdimnew=$(echo $xpicdim \* $scale |bc -l)
+		xpicdimnew=$(printf "%.0f" $xpicdimnew)
+		ypicdimnew=$(echo $ypicdim \* $scale |bc -l)
+		ypicdimnew=$(printf "%.0f" $ypicdimnew)
+		echo xdim $xpicdimnew
+		echo ydim $ypicdimnew 
+		
+	fi
+fi
+
+
+#IMAGE TOO LOW AND TOO NARROW
+newsize=$(echo ${xpicdimnew}x${ypicdimnew})
+echo $newsize
+echo perse3
+gifsicle $file --resize $newsize > ${filename}_res.gif
+gifview -a ${filename}_res.gif
+
+
+
+#screendim=$(xdpyinfo |grep dimension |awk '{print $2}')
+#xdim=$(echo $screendim |cut -d"x" -f1)
+#ydim=$(echo $screendim |cut -d"x" -f2)
+
