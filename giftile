@@ -3,14 +3,21 @@
 # count=`expr 3 / 3` 
 
 file=$1
+
+#PROTECT THE ORIGINAL GIF
 filename=$(echo $file |cut -d"." -f1)
-cp $file ${filename}_bu.gif
+cp $file ${filename}_use.gif
+
+
+#MUISTA LISAA UUDEN KUVAN NIMEN KAYTTO
+file=${filename}_use.gif
+#filename=$(echo $file |cut -d"." -f1)
+
+
+echo $filename
 
 xwindim=$(wmctrl -lG |grep $filename |awk '{print $5}')
 ywindim=$(wmctrl -lG |grep $filename |awk '{print $6}')
-
-#xwindim=$(wmctrl -lG |grep gifview |awk '{print $5}')
-#ywindim=$(wmctrl -lG |grep gifview |awk '{print $6}')
 
 xpicdim=$(file $file |awk '{print $7}')
 ypicdim=$(file $file |awk '{print $9}')
@@ -18,6 +25,8 @@ ypicdim=$(file $file |awk '{print $9}')
 
 echo $xwindim $ywindim $xpicdim $ypicdim 
 
+# IMAGE TOO HIGH AND TOO NARROW 
+#if [ $xpicdim -lt $xwindim ] && [ $ypicdim -ge $ywindim ]
 if [ $xpicdim -lt $xwindim ] && [ $ypicdim -ge $ywindim ]
 then
 echo IMAGE TOO HIGH AND TOO NARROW 
@@ -28,6 +37,7 @@ echo IMAGE TOO HIGH AND TOO NARROW
 	echo $xpicdimnew $ypicdimnew
 fi
 
+# IMAGE TOO WIDE AND TOO LOW
 if [ $xpicdim -ge $xwindim ] && [ $ypicdim -lt $ywindim ]
 then
 echo IMAGE TOO WIDE AND TOO LOW
@@ -38,6 +48,7 @@ echo IMAGE TOO WIDE AND TOO LOW
 	echo $xpicdimnew $ypicdimnew
 fi
 
+# IMAGE TOO HIGH AND TOO WIDE
 if [ $xpicdim -ge $xwindim ] && [ $ypicdim -ge $ywindim ]
 then
 echo IMAGE TOO HIGH AND TOO WIDE
@@ -79,7 +90,47 @@ echo IMAGE TOO HIGH AND TOO WIDE
 fi
 
 
-#IMAGE TOO LOW AND TOO NARROW
+# IMAGE TOO LOW AND NARROW
+if [ $xpicdim -le $xwindim ] && [ $ypicdim -le $ywindim ]
+then
+echo IMAGE TOO LOW AND NARROW
+	xdif=$(echo $xwindim - $xpicdim |bc -l)
+	ydif=$(echo $ywindim - $ypicdim |bc -l)
+
+	echo perse12
+	echo $xdif
+	echo $ydif
+
+	if [ $xdif -lt $ydif ]
+	then
+		echo perse4
+		scale=$(echo $xwindim / $xpicdim |bc -l)
+		echo $scale
+		xpicdimnew=$(echo $xpicdim \* $scale |bc -l)
+		xpicdimnew=$(printf "%.0f" $xpicdimnew)
+		echo perse8 $ypicdim
+		ypicdimnew=$(echo $ypicdim \* $scale |bc -l) 
+		ypicdimnew=$(printf "%.0f" $ypicdimnew)
+		echo perse6 $xpicdimnew
+		echo perse7 $ypicdimnew
+	fi
+
+	if [ $xdif -gt $ydif ]
+	then
+		echo perse5
+		
+		scale=$(echo $ywindim / $ypicdim |bc -l)
+		echo $scale
+		xpicdimnew=$(echo $xpicdim \* $scale |bc -l)
+		xpicdimnew=$(printf "%.0f" $xpicdimnew)
+		ypicdimnew=$(echo $ypicdim \* $scale |bc -l)
+		ypicdimnew=$(printf "%.0f" $ypicdimnew)
+		echo xdim $xpicdimnew
+		echo ydim $ypicdimnew 
+		
+	fi
+fi
+
 newsize=$(echo ${xpicdimnew}x${ypicdimnew})
 echo $newsize
 echo perse3
