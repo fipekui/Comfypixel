@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-file=$1
+file=gifs/$1
 
 #PROTECT THE ORIGINAL GIF
 filename=$(echo $file |cut -d"." -f1)
