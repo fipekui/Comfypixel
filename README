@@ -1,0 +1,41 @@
+This script resizes and plays a gif file according to
+the entered parameters.
+
+Example
+
+./giftile 10.gif X Y
+
+Parameter 1: Gif file you want to use
+parameter 2: Screen horizontal size dividing number
+parameter 3: Screen vertical size dividing number
+
+So if you want a window that is 1/4 of your screen you divide
+both axes with 2. If you want a window that is one half of 
+your screen you use X divider 2 and Y divider 1
+
+Examples
+
+./giftile 10.gif 2 1
+ ________
+|    ####|
+|    ####|
+ ''''''''
+
+./giftile 10.gif 2 2
+ ________
+|    ####|
+|        |
+ ''''''''
+
+./giftile 10.gif 4 2 
+ ________
+|      ##|
+|        |
+ ''''''''
+./giftile 10.gif 4 1
+ ________
+|      ##|
+|      ##|
+ ''''''''
+
+ETC
